@@ -1,27 +1,25 @@
-# Тут колись буде код! xD
+# https://gist.github.com/clayalvord/3055865
 
-def mac_address
-  return @mac_address if defined? @mac_address
-  re = %r/^:-{5}[0-9A-Za-z][0-9A-Za-z][^:-]/o
-  lines = nil
-  cmds = ‘/sbin/ifconfig’, ‘/bin/ifconfig’, ‘ifconfig’,‘ipconfig /all’
-  cmds.each do |cmd|
-    begin
-      stdout = IO.popen(cmd){|fd| fd.readlines}
-    rescue
-      stdout = nil
-    end
-    next unless stdout and stdout.size > 0
-    lines = stdout and break
-  end
-  raise "failed" unless lines
+@user = 'whoami'
+@system = 'scutil --get ComputerName'
+@ip = ('ifconfig en0 | grep netmask').split
+@vers = ('sw_vers | grep ProductVersion').split
+@hw_info = 'system_profiler'
+@up = ('uptime').split(',')
 
-  candidates = lines.select{|line| line =~ re}
-  raise 'no mac address candidates' unless candidates.first
-
-  maddr = candidates.first[re]
-  raise 'no mac address found' unless maddr
-  @mac_address = maddr.strip
+if @vers[1].include?('10.5')
+  @hw_name = 'Processor Name'
+  @hw_speed = 'Processor Speed'
+else
+  @hw_name = 'CPU Type'
+  @hw_speed = 'CPU Speed'
 end
 
-puts mac_address
+puts "User: #{@user}"
+puts "Computer: #{@system}"
+puts "IP: #{@ip[1]}"
+puts "OS Version: #{@vers[1]}"
+puts @hw_info.grep(/#{@hw_name}/).to_s.strip
+puts @hw_info.grep(/#{@hw_speed}/)[0].to_s.strip
+puts @hw_info.grep(/Memory:/)[0].to_s.strip
+puts "Uptime: #{@up[0].strip}"
