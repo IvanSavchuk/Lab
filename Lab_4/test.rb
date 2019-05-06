@@ -1,5 +1,5 @@
 # i = shell_dir_listing = `ifconfig`
 
-cmd = 'ifconfig'
-system(cmd)
+cpu = 'hwinfo --cpu'
+system(cpu)
  
